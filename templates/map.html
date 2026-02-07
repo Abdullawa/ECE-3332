@@ -25,7 +25,7 @@
         
         function updatePosition() {
              // Make a request to your Flask API
-    fetch('http://127.0.0.1:5000/api/position')
+    fetch('/api/position')
         .then(response => response.json())  // Convert response to JSON
         .then(data => {
             // data now contains {latitude: ..., longitude: ..., timestamp: ...}
