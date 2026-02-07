@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GPS Tracker</title>
+    <!-- Leaflet CSS and JS go HERE in the head -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+</head>
+<body>
+    <h1>Live GPS Map</h1>
+    
+    <!-- Map container div goes HERE in the body -->
+    <div id="map" style="width: 100%; height: 600px;"></div>
+    
+    <!-- JavaScript code goes HERE at the bottom of body, before closing </body> tag -->
+    <script>
+        // All your map creation and update code goes here
+        var map = L.map('map').setView([33.587, -101.875], 13);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+        }).addTo(map);
+        
+        var marker = L.marker([33.587, -101.875]).addTo(map);
+        
+        function updatePosition() {
+             // Make a request to your Flask API
+    fetch('http://127.0.0.1:5000/api/position')
+        .then(response => response.json())  // Convert response to JSON
+        .then(data => {
+            // data now contains {latitude: ..., longitude: ..., timestamp: ...}
+            var newLatLng = [data.latitude, data.longitude];
+            
+            // Move the marker to new position
+            marker.setLatLng(newLatLng);
+            
+            // Optionally center the map on the new position
+            map.setView(newLatLng);
+            
+            console.log('Updated position:', data);
+        })
+        .catch(error => {
+            console.error('Error fetching position:', error);
+        });
+        }
+        
+        setInterval(updatePosition, 2000);
+        updatePosition();
+    </script>
+</body>
+</html>
