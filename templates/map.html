@@ -6,8 +6,11 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
-<body>
-    <h1>Live GPS Map</h1>
+<body>                                            
+    <h2>Tracking the latest position and history</h2>
+    <p>
+    <a id="googleMapsLink" href="#" target="_blank">View current location in Google Maps</a>
+</p>
     
     <!-- Map container div goes HERE in the body -->
     <div id="map" style="width: 100%; height: 600px;"></div>
@@ -22,28 +25,50 @@
         }).addTo(map);
         
         var marker = L.marker([33.587, -101.875]).addTo(map);
+
+        var pathline = L.polyline([],{
+            color: 'blue',
+            weight: 3
+        }).addTo(map);
+
+        function loadHistory() {
+    fetch('/api/history')
+        .then(response => response.json())
+        .then(data => {
+            if (data.length > 0) {
+                var coords = data.map(point => [point.latitude, point.longitude]);
+                pathline.setLatLngs(coords);
+                var lastPoint = coords[coords.length - 1];
+                marker.setLatLng(lastPoint);
+                map.fitBounds(pathline.getBounds());
+                
+                // Update Google Maps link
+                var lat = lastPoint[0];
+                var lng = lastPoint[1];
+                var googleMapsUrl = `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+                document.getElementById('googleMapsLink').href = googleMapsUrl;
+                
+                console.log('Loaded', data.length,"points of history");
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching history:', error);
+        });
+}
         
         function updatePosition() {
-             // Make a request to your Flask API
     fetch('/api/position')
-        .then(response => response.json())  // Convert response to JSON
+        .then(response => response.json())
         .then(data => {
-            // data now contains {latitude: ..., longitude: ..., timestamp: ...}
-            var newLatLng = [data.latitude, data.longitude];
-            
-            // Move the marker to new position
-            marker.setLatLng(newLatLng);
-            
-            // Optionally center the map on the new position
-            map.setView(newLatLng);
-            
+            loadHistory();  // This updates everything
             console.log('Updated position:', data);
         })
         .catch(error => {
             console.error('Error fetching position:', error);
         });
-        }
+}
         
+        loadHistory();
         setInterval(updatePosition, 2000);
         updatePosition();
     </script>

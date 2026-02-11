@@ -133,15 +133,15 @@ print(gps.latitude, gps.longitude)
 # Print the Google Maps link for the location
 #print(gps.google_maps_link())
 # Save the parsed GPS data to a file
-while True:
-    gps.latitude += random.uniform(-0.001, 0.001)  # Simulate slight changes in latitude
-    gps.longitude += random.uniform(-0.001, 0.001)  # Simulate slight changes in longitude
+while True:  # Simulate multiple GPS readings
+    gps.latitude += random.uniform(-0.01, 0.01)  # Simulate slight changes in latitude
+    gps.longitude += random.uniform(-0.01, 0.01)                                                                                                                                                                                # Simulate slight changes in longitude
     gps.save_to_file(r'C:\ECE-3332\GPSdata.txt')
 
 # Load GPS data from file and create a map
-maps_handler = GPSMapsHandler()
-maps_handler.coordinates = maps_handler.load_gps_data(r'C:\ECE-3332\GPSdata.txt')
-maps_handler.create_map()
+#maps_handler = GPSMapsHandler()
+#maps_handler.coordinates = maps_handler.load_gps_data(r'C:\ECE-3332\GPSdata.txt')
+#maps_handler.create_map()
 
 
 
